@@ -1,10 +1,11 @@
+using System;
+using System.Collections.Generic;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using WalletService.Repositories;
 using WalletService.Dtos;
+using WalletService.Utils;
 using WalletService.Models;
-using System.Collections.Generic;
-using System;
 
 namespace WalletService.Controllers
 {
@@ -43,17 +44,21 @@ namespace WalletService.Controllers
         {
             try
             {
-                WalletMainDto newPayload = new WalletMainDto()
+                if (payload.AccountNumber == "") return BadRequest("Account Number is required");
+
+                string hashedNumber = new HashValues(payload.AccountNumber).Compute();
+
+                WalletInsertDto newPayload = new WalletInsertDto()
                 {
                     Name = payload.Name,
                     Type = payload.Type,
                     AccountNumber = payload.AccountNumber,
                     AccountScheme = payload.AccountScheme,
+                    AccountHash = hashedNumber,
                     Owner = payload.Owner,
                     Id = Guid.NewGuid(),
                     CreatedAt = DateTime.Now
                 };
-
 
                 var newWallet = dbMapper.Map<Wallet>(newPayload);
                 repo.CreateWallet(newWallet);

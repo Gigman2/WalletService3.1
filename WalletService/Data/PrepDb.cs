@@ -21,8 +21,17 @@ namespace WalletService.Data
             if (!context.Wallets.Any())
             {
                 context.AddRange(
-                    new Wallet() { Id = new Guid(), Name = "MTN Wallet", Type = "momo", AccountNumber = "0245268415", AccountScheme = "mtn", Owner = "0245268415", CreatedAt = DateTime.Now },
-                    new Wallet() { Id = new Guid(), Name = "Vodafone Wallet", Type = "momo", AccountNumber = "0502960152", AccountScheme = "vodafone", Owner = "0245268415", CreatedAt = DateTime.Now }
+                    new Wallet()
+                    {
+                        Id = new Guid(),
+                        Name = "MTN Wallet",
+                        Type = "momo",
+                        AccountHash = "3457D388991A7F81A540FEB4EABB915D",
+                        AccountNumber = "0245268415",
+                        AccountScheme = "mtn",
+                        Owner = "0245268415",
+                        CreatedAt = DateTime.Now
+                    }
                 );
 
                 context.SaveChanges();

@@ -8,7 +8,7 @@ namespace WalletService.Profiles
         public WalletProfile()
         {
             CreateMap<Wallet, WalletMainDto>();
-            CreateMap<WalletMainDto, Wallet>();
+            CreateMap<WalletInsertDto, Wallet>();
         }
     }
 }

@@ -20,6 +20,10 @@ namespace WalletService.Models
         public string AccountNumber { get; set; }
 
         [Required]
+        [Display(Name = "Account Hash")]
+        public string AccountHash { get; set; }
+
+        [Required]
         [Display(Name = "Account Scheme")]
         [RegularExpression("^(visa|mastercard|mtn|vodafone|airteltigo)$", ErrorMessage = "Invalid Account Scheme provided. ")]
         public string AccountScheme { get; set; }

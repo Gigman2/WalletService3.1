@@ -21,8 +21,12 @@ namespace WalletService.Dtos
         public DateTime CreatedAt { get; set; }
     }
 
-    public class WalletUpdateDto : WalletCreateDto
+    public class WalletInsertDto : WalletCreateDto
     {
-        public string CreatedAt { get; set; }
+        public Guid Id { get; set; }
+
+        public string AccountHash { get; set; }
+
+        public DateTime CreatedAt { get; set; }
     }
 }
