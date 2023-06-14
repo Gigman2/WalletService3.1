@@ -46,7 +46,7 @@ namespace WalletService.Repositories
 
         public bool DeleteWallet(Guid id)
         {
-            var wallet = dbContext.Wallets.Find();
+            var wallet = dbContext.Wallets.Find(id);
             if (wallet == null)
             {
                 throw new ArgumentNullException("Wallet not found");
