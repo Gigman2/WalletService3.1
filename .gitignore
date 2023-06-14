@@ -8,3 +8,5 @@ obj/
 *.Publish.xml
 
 .vs
+
+Migrations/
