@@ -45,11 +45,6 @@ namespace WalletService.Controllers
         {
             try
             {
-                Console.WriteLine($"Hello world {!ModelState.IsValid}");
-                if (!ModelState.IsValid)
-                {
-                    return BadRequest(new { message = "One or more validation errors occurred.", errorCode = 400, errors = ModelState });
-                }
                 string hashedNumber = new HashValues(payload.AccountNumber).Compute();
                 // Check uniqueness of accountNumber
                 var walletExist = await repo.WalletsExist(hashedNumber);
