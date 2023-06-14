@@ -1,3 +1,5 @@
+#nullable enable
+
 using System;
 using System.Linq;
 using System.Collections.Generic;
@@ -19,21 +21,12 @@ namespace WalletService.Repositories
         }
         public void CreateWallet(Wallet wallet)
         {
-            if (wallet == null)
-            {
-                throw new ArgumentNullException(nameof(wallet), "Invalid payload sent");
-            }
-
             dbContext.Add(wallet);
         }
 
-        public Wallet GetWalletById(Guid id)
+        public Wallet? GetWalletById(Guid id)
         {
             var wallet = dbContext.Wallets.Find(id);
-            if (wallet == null)
-            {
-                throw new ArgumentNullException(nameof(wallet), "Wallet not found");
-            }
             return wallet;
         }
 
@@ -52,7 +45,7 @@ namespace WalletService.Repositories
             var wallet = dbContext.Wallets.Find(id);
             if (wallet == null)
             {
-                throw new ArgumentNullException("Wallet not found");
+                return false;
             }
             dbContext.Remove(wallet);
             return (dbContext.SaveChanges() >= 0);

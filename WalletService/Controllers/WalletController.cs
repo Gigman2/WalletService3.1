@@ -43,62 +43,49 @@ namespace WalletService.Controllers
         [HttpPost]
         public async Task<ActionResult<WalletMainDto>> CreateWallet(WalletCreateDto payload)
         {
-            try
+            string hashedNumber = new HashValues(payload.AccountNumber).Compute();
+            // Check uniqueness of accountNumber
+            var walletExist = await repo.WalletsExist(hashedNumber);
+            if (walletExist) return BadRequest(new { message = "A wallet with this account number already exist", errorCode = 400 });
+
+            if (payload.Type == "card" && payload.AccountNumber.Length >= 6)
+                payload.AccountNumber = payload.AccountNumber.Substring(0, 6); // cut the first 6 digits
+
+            // Get all wallets of account holder and make sure user does not have more than 5 wallets
+            var total = repo.TotalWalletsOwned(payload.Owner);
+            if (total >= 5) return BadRequest(new { message = "User has more than 5 wallets", errorCode = 400 });
+
+            WalletInsertDto newPayload = new WalletInsertDto()
             {
-                string hashedNumber = new HashValues(payload.AccountNumber).Compute();
-                // Check uniqueness of accountNumber
-                var walletExist = await repo.WalletsExist(hashedNumber);
-                if (walletExist) return BadRequest(new { message = "A wallet with this account number already exist", errorCode = 400 });
+                Name = payload.Name,
+                Type = payload.Type,
+                AccountNumber = payload.AccountNumber,
+                AccountScheme = payload.AccountScheme,
+                AccountHash = hashedNumber,
+                Owner = payload.Owner,
+                Id = Guid.NewGuid(),
+                CreatedAt = DateTime.Now
+            };
 
-                if (payload.Type == "card" && payload.AccountNumber.Length >= 6)
-                    payload.AccountNumber = payload.AccountNumber.Substring(0, 6); // cut the first 6 digits
-
-                // Get all wallets of account holder and make sure user does not have more than 5 wallets
-                var total = repo.TotalWalletsOwned(payload.Owner);
-                if (total >= 5) return BadRequest(new { message = "User has more than 5 wallets", errorCode = 400 });
-
-                WalletInsertDto newPayload = new WalletInsertDto()
-                {
-                    Name = payload.Name,
-                    Type = payload.Type,
-                    AccountNumber = payload.AccountNumber,
-                    AccountScheme = payload.AccountScheme,
-                    AccountHash = hashedNumber,
-                    Owner = payload.Owner,
-                    Id = Guid.NewGuid(),
-                    CreatedAt = DateTime.Now
-                };
-
-                var newWallet = dbMapper.Map<Wallet>(newPayload);
-                repo.CreateWallet(newWallet);
-                var saved = repo.SaveChanges();
-                if (!saved)
-                {
-                    return BadRequest();
-                }
-
-                var result = dbMapper.Map<WalletMainDto>(newWallet);
-                return Ok(result);
-            }
-            catch (ArgumentNullException ex)
+            var newWallet = dbMapper.Map<Wallet>(newPayload);
+            repo.CreateWallet(newWallet);
+            var saved = repo.SaveChanges();
+            if (!saved)
             {
-                return BadRequest(new { message = ex.Message, errorCode = 400 });
+                return BadRequest();
             }
+
+            var result = dbMapper.Map<WalletMainDto>(newWallet);
+            return Ok(result);
         }
 
         [HttpDelete]
         [Route("{id:guid}")]
         public ActionResult RemoveWallet([FromRoute] Guid id)
         {
-            try
-            {
-                var done = repo.DeleteWallet(id);
-                return Ok(done);
-            }
-            catch (ArgumentNullException ex)
-            {
-                return BadRequest(new { ErrorMessage = ex.Message, ErrorCode = 400 });
-            }
+            var done = repo.DeleteWallet(id);
+            if (done) return Ok();
+            return NotFound();
         }
     }
 }

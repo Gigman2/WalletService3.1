@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -11,7 +12,7 @@ namespace WalletService.Repositories
 
         IEnumerable<Wallet> GetWallets();
 
-        Wallet GetWalletById(Guid id);
+        Wallet? GetWalletById(Guid id);
 
         bool DeleteWallet(Guid id);
 
