@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using WalletService.Models;
 namespace WalletService.Repositories
 {
@@ -13,5 +14,9 @@ namespace WalletService.Repositories
         Wallet GetWalletById(Guid id);
 
         bool DeleteWallet(Guid id);
+
+        Task<bool> WalletsExist(string hash);
+
+        int TotalWalletsOwned(string owner);
     }
 }

@@ -1,16 +1,23 @@
 using System;
+using System.ComponentModel.DataAnnotations;
+
 namespace WalletService.Dtos
 {
     public class WalletCreateDto
     {
+        [Required]
         public string Name { get; set; }
 
+        [Required]
         public string Type { get; set; }
 
+        [Required]
         public string AccountNumber { get; set; }
 
+        [Required]
         public string AccountScheme { get; set; }
 
+        [Required]
         public string Owner { get; set; }
     }
 

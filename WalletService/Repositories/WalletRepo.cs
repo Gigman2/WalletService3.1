@@ -3,6 +3,9 @@ using System.Linq;
 using System.Collections.Generic;
 using WalletService.Data;
 using WalletService.Models;
+using WalletService.Utils;
+using Microsoft.EntityFrameworkCore;
+using System.Threading.Tasks;
 
 namespace WalletService.Repositories
 {
@@ -53,6 +56,22 @@ namespace WalletService.Repositories
             }
             dbContext.Remove(wallet);
             return (dbContext.SaveChanges() >= 0);
+        }
+        public int TotalWalletsOwned(string owner)
+        {
+            var wallets = dbContext.Wallets
+                .Where(w => w.Owner == owner)
+                .ToList();
+
+            return wallets.Count();
+        }
+
+        public async Task<bool> WalletsExist(string hash)
+        {
+            var exist = await dbContext.Wallets
+                .Where(w => w.AccountHash == hash)
+                .ToListAsync();
+            return exist.Any();
         }
     }
 }

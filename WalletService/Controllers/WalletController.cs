@@ -6,6 +6,7 @@ using WalletService.Repositories;
 using WalletService.Dtos;
 using WalletService.Utils;
 using WalletService.Models;
+using System.Threading.Tasks;
 
 namespace WalletService.Controllers
 {
@@ -23,7 +24,7 @@ namespace WalletService.Controllers
         }
 
         [HttpGet]
-        public ActionResult<IEnumerable<WalletMainDto>> GetWallets()
+        public ActionResult<IEnumerable<WalletInsertDto>> GetWallets()
         {
             var wallet = repo.GetWallets();
             return Ok(dbMapper.Map<IEnumerable<WalletMainDto>>(wallet));
@@ -40,13 +41,26 @@ namespace WalletService.Controllers
         }
 
         [HttpPost]
-        public ActionResult<WalletMainDto> CreateWallet(WalletCreateDto payload)
+        public async Task<ActionResult<WalletMainDto>> CreateWallet(WalletCreateDto payload)
         {
             try
             {
-                if (payload.AccountNumber == "") return BadRequest("Account Number is required");
-
+                Console.WriteLine($"Hello world {!ModelState.IsValid}");
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(new { message = "One or more validation errors occurred.", errorCode = 400, errors = ModelState });
+                }
                 string hashedNumber = new HashValues(payload.AccountNumber).Compute();
+                // Check uniqueness of accountNumber
+                var walletExist = await repo.WalletsExist(hashedNumber);
+                if (walletExist) return BadRequest(new { message = "A wallet with this account number already exist", errorCode = 400 });
+
+                if (payload.Type == "card" && payload.AccountNumber.Length >= 6)
+                    payload.AccountNumber = payload.AccountNumber.Substring(0, 6); // cut the first 6 digits
+
+                // Get all wallets of account holder and make sure user does not have more than 5 wallets
+                var total = repo.TotalWalletsOwned(payload.Owner);
+                if (total >= 5) return BadRequest(new { message = "User has more than 5 wallets", errorCode = 400 });
 
                 WalletInsertDto newPayload = new WalletInsertDto()
                 {
@@ -73,7 +87,7 @@ namespace WalletService.Controllers
             }
             catch (ArgumentNullException ex)
             {
-                return BadRequest(new { ErrorMessage = ex.Message, ErrorCode = 400 });
+                return BadRequest(new { message = ex.Message, errorCode = 400 });
             }
         }
 
