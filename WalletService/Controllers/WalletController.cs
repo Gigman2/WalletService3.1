@@ -60,7 +60,7 @@ namespace WalletService.Controllers
         {
             try
             {
-                string hashedNumber = new HashValues(payload.AccountNumber).Compute();
+                string hashedNumber = HashValues.Compute(payload.AccountNumber);
                 // Check uniqueness of accountNumber
                 var walletExist = await repo.WalletsExist(hashedNumber);
                 if (walletExist) return BadRequest(new { message = "A wallet with this account number already exist", errorCode = 400 });

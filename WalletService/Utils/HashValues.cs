@@ -3,24 +3,17 @@ using System.Text;
 
 namespace WalletService.Utils
 {
-    public class HashValues
+    public static class HashValues
     {
-        private string value;
-        private byte[] tmpValue;
-        private byte[] tmpHash;
-        public HashValues(string initialValue)
+        public static string Compute(string value)
         {
-            value = initialValue;
-        }
-
-        public string Compute()
-        {
+            byte[] tmpValue;
             tmpValue = ASCIIEncoding.ASCII.GetBytes(value);
-            tmpHash = new MD5CryptoServiceProvider().ComputeHash(tmpValue);
-            return ByteArrayToString(tmpHash);
+            byte[] tmpHash = new MD5CryptoServiceProvider().ComputeHash(tmpValue);
+            return HashValues.ByteArrayToString(tmpHash);
         }
 
-        private string ByteArrayToString(byte[] arrInput)
+        private static string ByteArrayToString(byte[] arrInput)
         {
             int i;
             StringBuilder sOutput = new StringBuilder(arrInput.Length);
