@@ -9,12 +9,14 @@ namespace WalletService.Dtos
         public string Name { get; set; }
 
         [Required]
+        [RegularExpression("^(momo|card)$", ErrorMessage = "Type must be either 'momo' or 'card'.")]
         public string Type { get; set; }
 
         [Required]
         public string AccountNumber { get; set; }
 
         [Required]
+        [RegularExpression("^(visa|mastercard|mtn|vodafone|airteltigo)$", ErrorMessage = "Invalid Account Scheme provided. ")]
         public string AccountScheme { get; set; }
 
         [Required]

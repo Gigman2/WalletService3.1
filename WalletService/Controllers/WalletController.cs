@@ -25,7 +25,7 @@ namespace WalletService.Controllers
         }
 
         [HttpGet]
-        public ActionResult<IEnumerable<WalletInsertDto>> GetWallets()
+        public ActionResult<IEnumerable<WalletMainDto>> GetWallets()
         {
             try
             {
