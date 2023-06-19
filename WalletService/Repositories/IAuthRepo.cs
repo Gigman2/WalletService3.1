@@ -12,6 +12,6 @@ namespace WalletService.Repositories
 
         IEnumerable<Auth> GetAccounts();
 
-        Auth? findAccount(string Id, string code);
+        Task<Auth?> findAccount(string Id, string code);
     }
 }

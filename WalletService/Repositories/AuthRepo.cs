@@ -1,11 +1,12 @@
 #nullable enable
 
-using System;
-using System.Linq;
+using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using WalletService.Data;
 using WalletService.Models;
 using WalletService.Utils;
+using System.Threading.Tasks;
+using System.Linq;
 
 namespace WalletService.Repositories
 {
@@ -22,10 +23,12 @@ namespace WalletService.Repositories
             dbContext.Add(account);
         }
 
-        public Auth? findAccount(string accountId, string accountCode)
+        public async Task<Auth?> findAccount(string accountId, string accountCode)
         {
             string hashedCode = HashValues.Compute(accountCode);
-            var account = dbContext.Accounts.Where(w => w.accountID == accountId && w.accountHash == hashedCode).FirstOrDefault();
+            var account = await dbContext.Accounts
+                .Where(w => w.accountID == accountId && w.accountHash == hashedCode)
+                .FirstOrDefaultAsync();
             return account;
         }
 

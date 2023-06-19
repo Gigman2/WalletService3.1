@@ -11,6 +11,7 @@ using System.Text;
 using System.Collections.Generic;
 using System.Security.Claims;
 using Microsoft.IdentityModel.Tokens;
+using System.Threading.Tasks;
 
 namespace WalletService.Controllers
 {
@@ -59,10 +60,10 @@ namespace WalletService.Controllers
 
         [HttpPost]
         [Route("authenticate")]
-        public IActionResult Authenticate([FromBody] AuthLoginDto account)
+        public async Task<IActionResult> Authenticate([FromBody] AuthLoginDto account)
         {
 
-            var authenticatedUser = repo.findAccount(account.accountID, account.code);
+            var authenticatedUser = await repo.findAccount(account.accountID, account.code);
             if (authenticatedUser == null) return NotFound();
 
             var tokenHandler = new JwtSecurityTokenHandler();
