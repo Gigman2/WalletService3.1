@@ -89,7 +89,7 @@ namespace WalletService.Controllers
                 var saved = repo.SaveChanges();
                 if (!saved)
                 {
-                    return BadRequest();
+                    return BadRequest(33);
                 }
 
                 var result = dbMapper.Map<WalletMainDto>(newWallet);

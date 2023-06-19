@@ -10,5 +10,7 @@ namespace WalletService.Data
         }
 
         public DbSet<Wallet> Wallets { get; set; }
+
+        public DbSet<Auth> Accounts { get; set; }
     }
 }
