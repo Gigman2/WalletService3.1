@@ -29,9 +29,9 @@ namespace WalletService.Repositories
             return (dbContext.SaveChanges() >= 0);
         }
 
-        public bool DeleteWallet(Guid id)
+        public async Task<bool> DeleteWallet(Guid id)
         {
-            var wallet = dbContext.Wallets.Find(id);
+            var wallet = await dbContext.Wallets.FindAsync(id);
             if (wallet == null)
             {
                 return false;
@@ -39,51 +39,51 @@ namespace WalletService.Repositories
             dbContext.Remove(wallet);
             return (dbContext.SaveChanges() >= 0);
         }
-        public int TotalWalletsOwned(string owner)
+        public async Task<int> TotalWalletsOwned(string owner)
         {
-            var wallets = dbContext.Wallets
+            var wallets = await dbContext.Wallets
                 .Where(w => w.Owner == owner)
-                .ToList();
+                .ToListAsync();
 
             return wallets.Count();
         }
 
-        public bool WalletsExist(string hash)
+        public async Task<bool> WalletsExist(string hash)
         {
-            var exist = dbContext.Wallets
+            var exist = await dbContext.Wallets
                 .Where(w => w.AccountHash == hash)
-                .ToList();
+                .ToListAsync();
             return exist.Any();
         }
 
 
-        public Wallet? GetWalletById(Guid id)
+        public async Task<Wallet?> GetWalletById(Guid id)
         {
-            var wallet = dbContext.Wallets.Find(id);
+            var wallet = await dbContext.Wallets.FindAsync(id);
             return wallet;
         }
 
-        public IEnumerable<Wallet> GetWallets(int page, int pagesize)
+        public async Task<IEnumerable<Wallet>> GetWallets(int page, int pagesize)
         {
-            return dbContext.Wallets
+            var query = dbContext.Wallets
                 .OrderBy(e => e.CreatedAt)
                 .Skip((page - 1) * pagesize)
-                .Take(pagesize)
-                .ToList();
+                .Take(pagesize);
+            return await query.ToListAsync();
         }
 
 
-        public Wallet? GetOwnerWalletById(Guid id, string ownerId)
+        public async Task<Wallet?> GetOwnerWalletById(Guid id, string ownerId)
         {
-            var wallet = dbContext.Wallets
+            var wallet = await dbContext.Wallets
                 .Where(w => w.Id == id && w.Owner == ownerId)
-                .FirstOrDefault();
+                .FirstOrDefaultAsync();
             return wallet;
         }
 
-        public IEnumerable<Wallet> GetOwnersWallets(string id)
+        public async Task<IEnumerable<Wallet>> GetOwnersWallets(string id)
         {
-            return dbContext.Wallets.Where(w => w.Owner == id);
+            return await dbContext.Wallets.Where(w => w.Owner == id).ToListAsync();
         }
     }
 }

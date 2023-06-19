@@ -9,6 +9,7 @@ using WalletService.Utils;
 using WalletService.Models;
 using WalletService.Identity;
 using Microsoft.AspNetCore.Authorization;
+using System.Threading.Tasks;
 
 namespace WalletService.Controllers
 {
@@ -27,13 +28,13 @@ namespace WalletService.Controllers
 
         [Authorize]
         [HttpGet]
-        public ActionResult<IEnumerable<WalletMainDto>> GetWalletsByAccount()
+        public async Task<ActionResult<IEnumerable<WalletMainDto>>> GetWalletsByAccount()
         {
             try
             {
                 var accountID = User.FindFirst("accountid").Value;
 
-                var wallet = repo.GetOwnersWallets(accountID);
+                var wallet = await repo.GetOwnersWallets(accountID);
                 return Ok(dbMapper.Map<IEnumerable<WalletMainDto>>(wallet));
             }
             catch (System.Exception)
@@ -45,12 +46,12 @@ namespace WalletService.Controllers
         [Authorize]
         [HttpGet]
         [Route("{id:guid}")]
-        public ActionResult<WalletMainDto> GetWalletById([FromRoute] Guid id)
+        public async Task<ActionResult<WalletMainDto>> GetWalletById([FromRoute] Guid id)
         {
             try
             {
                 var accountID = User.FindFirst("accountid").Value;
-                var wallet = repo.GetOwnerWalletById(id, accountID);
+                var wallet = await repo.GetOwnerWalletById(id, accountID);
                 if (wallet == null) return NotFound();
 
                 return Ok(dbMapper.Map<WalletMainDto>(wallet));
@@ -63,21 +64,21 @@ namespace WalletService.Controllers
 
         [Authorize]
         [HttpPost]
-        public ActionResult<WalletMainDto> CreateWallet(WalletCreateDto payload)
+        public async Task<ActionResult<WalletMainDto>> CreateWallet(WalletCreateDto payload)
         {
             try
             {
                 var accountID = User.FindFirst("accountid").Value;
                 string hashedNumber = HashValues.Compute(payload.AccountNumber);
                 // Check uniqueness of accountNumber
-                var walletExist = repo.WalletsExist(hashedNumber);
+                var walletExist = await repo.WalletsExist(hashedNumber);
                 if (walletExist) return BadRequest(new { message = "A wallet with this account number already exist", errorCode = 400 });
 
                 if (payload.Type == "card" && payload.AccountNumber.Length >= 6)
                     payload.AccountNumber = payload.AccountNumber.Substring(0, 6); // cut the first 6 digits
 
                 // Get all wallets of account holder and make sure user does not have more than 5 wallets
-                var total = repo.TotalWalletsOwned(accountID);
+                var total = await repo.TotalWalletsOwned(accountID);
                 if (total >= 5) return BadRequest(new { message = "User has more than 5 wallets", errorCode = 400 });
 
                 WalletInsertDto newPayload = new WalletInsertDto()
@@ -113,11 +114,11 @@ namespace WalletService.Controllers
         [Authorize(Policy = IdentityData.AdminUserPolicyName)]
         [HttpDelete]
         [Route("{id:guid}")]
-        public ActionResult RemoveWallet([FromRoute] Guid id)
+        public async Task<ActionResult> RemoveWallet([FromRoute] Guid id)
         {
             try
             {
-                var done = repo.DeleteWallet(id);
+                var done = await repo.DeleteWallet(id);
                 if (done) return Ok();
                 return NotFound();
             }
@@ -129,11 +130,12 @@ namespace WalletService.Controllers
 
         [Authorize(Policy = IdentityData.AdminUserPolicyName)]
         [HttpGet]
-        public ActionResult<IEnumerable<WalletMainDto>> GetWallets([FromQuery] WalletQueryDto query)
+        [Route("admin")]
+        public async Task<ActionResult<IEnumerable<WalletMainDto>>> GetWallets([FromQuery] WalletQueryDto query)
         {
             try
             {
-                var wallet = repo.GetWallets(query.page, query.pagesize);
+                var wallet = await repo.GetWallets(query.page, query.pagesize);
                 return Ok(dbMapper.Map<IEnumerable<WalletMainDto>>(wallet));
             }
             catch (System.Exception)
@@ -144,14 +146,13 @@ namespace WalletService.Controllers
 
         [Authorize(Policy = IdentityData.AdminUserPolicyName)]
         [HttpGet]
-        [Route("{id:guid}")]
-        public ActionResult<WalletMainDto> GetWallet([FromRoute] Guid id)
+        [Route("admin/{id:guid}")]
+        public async Task<ActionResult<WalletMainDto>> GetWallet([FromRoute] Guid id)
         {
             try
             {
-                var wallet = repo.GetWalletById(id);
+                var wallet = await repo.GetWalletById(id);
                 if (wallet == null) return NotFound();
-
                 return Ok(dbMapper.Map<WalletMainDto>(wallet));
             }
             catch (System.Exception)

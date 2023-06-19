@@ -5,9 +5,9 @@ namespace WalletService.Dtos
 {
     public class WalletQueryDto
     {
-        public int pagesize { get; set; }
+        public int pagesize { get; set; } = 5;
 
-        public int page { get; set; }
+        public int page { get; set; } = 1;
     }
     public class WalletCreateDto
     {
