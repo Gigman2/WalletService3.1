@@ -32,6 +32,14 @@ namespace WalletService.Repositories
             return account;
         }
 
+        public async Task<bool> AccountExist(string accountId)
+        {
+            var exist = await dbContext.Accounts
+                .Where(w => w.accountID == accountId)
+                .ToListAsync();
+            return exist.Any();
+        }
+
         public IEnumerable<Auth> GetAccounts()
         {
             return dbContext.Accounts.ToList();

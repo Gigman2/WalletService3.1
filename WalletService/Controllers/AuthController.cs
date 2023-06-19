@@ -33,8 +33,11 @@ namespace WalletService.Controllers
         }
 
         [HttpPost]
-        public IActionResult CreateAccount([FromBody] AuthCreateDto account)
+        public async Task<IActionResult> CreateAccount([FromBody] AuthCreateDto account)
         {
+            var accountExist = await repo.AccountExist(account.accountID);
+            if (accountExist) return BadRequest(new { message = "An account with this number already exist", errorCode = 400 });
+
             string hashedCode = HashValues.Compute(account.code);
             AuthInsertDto newAccount = new AuthInsertDto()
             {
