@@ -11,6 +11,7 @@ namespace WalletService.Repositories
         bool SaveChanges();
 
         IEnumerable<Wallet> GetWallets();
+        IEnumerable<Wallet> GetWalletsByAccount(string id);
 
         Wallet? GetWalletById(Guid id);
 

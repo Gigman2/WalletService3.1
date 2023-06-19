@@ -8,6 +8,7 @@ using WalletService.Dtos;
 using WalletService.Utils;
 using WalletService.Models;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 
 namespace WalletService.Controllers
 {
@@ -24,12 +25,15 @@ namespace WalletService.Controllers
             dbMapper = mapper;
         }
 
+        [Authorize]
         [HttpGet]
         public ActionResult<IEnumerable<WalletMainDto>> GetWallets()
         {
             try
             {
-                var wallet = repo.GetWallets();
+                var accountID = User.FindFirst("accountid").Value;
+
+                var wallet = repo.GetWalletsByAccount();
                 return Ok(dbMapper.Map<IEnumerable<WalletMainDto>>(wallet));
             }
             catch (System.Exception)
@@ -89,7 +93,7 @@ namespace WalletService.Controllers
                 var saved = repo.SaveChanges();
                 if (!saved)
                 {
-                    return BadRequest(33);
+                    return BadRequest();
                 }
 
                 var result = dbMapper.Map<WalletMainDto>(newWallet);

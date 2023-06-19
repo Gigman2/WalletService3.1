@@ -35,6 +35,11 @@ namespace WalletService.Repositories
             return dbContext.Wallets.ToList();
         }
 
+        public IEnumerable<Wallet> GetWalletsByAccount(string id)
+        {
+            return dbContext.Wallets.Where(w => w.Owner == id);
+        }
+
         public bool SaveChanges()
         {
             return (dbContext.SaveChanges() >= 0);

@@ -6,8 +6,6 @@ using System.Collections.Generic;
 using WalletService.Data;
 using WalletService.Models;
 using WalletService.Utils;
-using Microsoft.EntityFrameworkCore;
-using System.Threading.Tasks;
 
 namespace WalletService.Repositories
 {
