@@ -1,13 +1,18 @@
 using System;
+using System.Text;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+
 using WalletService.Data;
 using WalletService.Repositories;
+
 
 namespace WalletService
 {
@@ -26,7 +31,21 @@ namespace WalletService
             services.AddDbContext<AppDbContext>(options => options.UseSqlServer(
                 Configuration.GetConnectionString("DbConnectionString")
             ));
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
+            {
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+                    ValidIssuer = Configuration["JWT:Issuer"],
+                    ValidAudience = Configuration["JWT:Audience"],
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["JWT:Key"]))
+                };
+            });
             services.AddScoped<IWalletRepo, WalletRepo>();
+            services.AddScoped<IAuthRepo, AuthRepo>();
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
@@ -49,6 +68,7 @@ namespace WalletService
 
             app.UseRouting();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>

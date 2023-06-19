@@ -24,9 +24,10 @@ namespace WalletService.Repositories
             dbContext.Add(account);
         }
 
-        public Auth? ValidateAccount(string accountId, string accountCode)
+        public Auth? findAccount(string accountId, string accountCode)
         {
-            var account = dbContext.Accounts.Where(w => w.AccountID == accountId && w.AccountCode == accountCode).FirstOrDefault();
+            string hashedCode = HashValues.Compute(accountCode);
+            var account = dbContext.Accounts.Where(w => w.accountID == accountId && w.accountHash == hashedCode).FirstOrDefault();
             return account;
         }
 

@@ -10,6 +10,10 @@ namespace WalletService.Dtos
 
         [Required]
         public bool isAdmin { get; set; }
+
+        [Required]
+        [RegularExpression("^[0-9]{4}$", ErrorMessage = "Code is invalid. ")]
+        public string code { get; set; }
     }
 
     public class AuthMainDto : AuthDto

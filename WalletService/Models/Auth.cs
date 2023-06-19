@@ -11,13 +11,13 @@ namespace WalletService.Models
         public Guid Id { get; set; }
 
         [Required]
-        public string AccountID { get; set; }
+        public string accountID { get; set; }
 
         [Required]
-        public bool IsAdmin { get; set; }
+        public bool isAdmin { get; set; }
 
         [Required]
-        public string AccountCode { get; set; }
+        public string accountHash { get; set; }
 
 
         [Required]
