@@ -24,22 +24,6 @@ namespace WalletService.Repositories
             dbContext.Add(wallet);
         }
 
-        public Wallet? GetWalletById(Guid id)
-        {
-            var wallet = dbContext.Wallets.Find(id);
-            return wallet;
-        }
-
-        public IEnumerable<Wallet> GetWallets()
-        {
-            return dbContext.Wallets.ToList();
-        }
-
-        public IEnumerable<Wallet> GetWalletsByAccount(string id)
-        {
-            return dbContext.Wallets.Where(w => w.Owner == id);
-        }
-
         public bool SaveChanges()
         {
             return (dbContext.SaveChanges() >= 0);
@@ -64,12 +48,42 @@ namespace WalletService.Repositories
             return wallets.Count();
         }
 
-        public async Task<bool> WalletsExist(string hash)
+        public bool WalletsExist(string hash)
         {
-            var exist = await dbContext.Wallets
+            var exist = dbContext.Wallets
                 .Where(w => w.AccountHash == hash)
-                .ToListAsync();
+                .ToList();
             return exist.Any();
+        }
+
+
+        public Wallet? GetWalletById(Guid id)
+        {
+            var wallet = dbContext.Wallets.Find(id);
+            return wallet;
+        }
+
+        public IEnumerable<Wallet> GetWallets(int page, int pagesize)
+        {
+            return dbContext.Wallets
+                .OrderBy(e => e.CreatedAt)
+                .Skip((page - 1) * pagesize)
+                .Take(pagesize)
+                .ToList();
+        }
+
+
+        public Wallet? GetOwnerWalletById(Guid id, string ownerId)
+        {
+            var wallet = dbContext.Wallets
+                .Where(w => w.Id == id && w.Owner == ownerId)
+                .FirstOrDefault();
+            return wallet;
+        }
+
+        public IEnumerable<Wallet> GetOwnersWallets(string id)
+        {
+            return dbContext.Wallets.Where(w => w.Owner == id);
         }
     }
 }

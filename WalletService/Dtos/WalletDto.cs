@@ -3,6 +3,12 @@ using System.ComponentModel.DataAnnotations;
 
 namespace WalletService.Dtos
 {
+    public class WalletQueryDto
+    {
+        public int pagesize { get; set; }
+
+        public int page { get; set; }
+    }
     public class WalletCreateDto
     {
         [Required]
@@ -18,14 +24,14 @@ namespace WalletService.Dtos
         [Required]
         [RegularExpression("^(visa|mastercard|mtn|vodafone|airteltigo)$", ErrorMessage = "Invalid Account Scheme provided. ")]
         public string AccountScheme { get; set; }
-
-        [Required]
-        public string Owner { get; set; }
     }
 
     public class WalletMainDto : WalletCreateDto
     {
         public Guid Id { get; set; }
+
+        [Required]
+        public string Owner { get; set; }
 
         public DateTime CreatedAt { get; set; }
     }
@@ -35,6 +41,9 @@ namespace WalletService.Dtos
         public Guid Id { get; set; }
 
         public string AccountHash { get; set; }
+
+        [Required]
+        public string Owner { get; set; }
 
         public DateTime CreatedAt { get; set; }
     }

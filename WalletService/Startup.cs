@@ -12,7 +12,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 using WalletService.Data;
 using WalletService.Repositories;
-
+using WalletService.Identity;
 
 namespace WalletService
 {
@@ -44,6 +44,13 @@ namespace WalletService
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["JWT:Key"]))
                 };
             });
+            services.AddAuthorization(
+                options =>
+                {
+                    options.AddPolicy(IdentityData.AdminUserPolicyName, p =>
+                    p.RequireClaim(IdentityData.AdminUserClaimName, "True"));
+                }
+            );
             services.AddScoped<IWalletRepo, WalletRepo>();
             services.AddScoped<IAuthRepo, AuthRepo>();
             services.AddControllers();

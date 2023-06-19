@@ -10,14 +10,16 @@ namespace WalletService.Repositories
         void CreateWallet(Wallet wallet);
         bool SaveChanges();
 
-        IEnumerable<Wallet> GetWallets();
-        IEnumerable<Wallet> GetWalletsByAccount(string id);
+        IEnumerable<Wallet> GetWallets(int page, int pagesize);
+        IEnumerable<Wallet> GetOwnersWallets(string id);
+
+        Wallet? GetOwnerWalletById(Guid id, string owner);
 
         Wallet? GetWalletById(Guid id);
 
         bool DeleteWallet(Guid id);
 
-        Task<bool> WalletsExist(string hash);
+        bool WalletsExist(string hash);
 
         int TotalWalletsOwned(string owner);
     }

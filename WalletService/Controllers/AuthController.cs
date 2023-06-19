@@ -76,6 +76,8 @@ namespace WalletService.Controllers
                 new Claim ("isadmin", authenticatedUser.isAdmin.ToString())
             };
 
+            Console.Write($"Wallet {authenticatedUser.isAdmin.ToString()}");
+
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(claims),
