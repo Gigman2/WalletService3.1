@@ -81,6 +81,19 @@ namespace WalletService.Controllers
                 var total = await repo.TotalWalletsOwned(accountID);
                 if (total >= 5) return BadRequest(new { message = "User has more than 5 wallets", errorCode = 400 });
 
+                if (payload.Type == "card")
+                {
+                    var validCard = CardValidator.Validate(payload.AccountScheme, payload.AccountNumber);
+                    if (!validCard) return BadRequest(new { message = "Invalid card number", errorCode = 400 });
+                }
+                else if (payload.Type == "momo")
+                {
+                    var validCard = MomoValidator.Validate(payload.AccountScheme, payload.AccountNumber);
+                    if (!validCard) return BadRequest(new { message = "Invalid momo number", errorCode = 400 });
+                }
+
+
+
                 WalletInsertDto newPayload = new WalletInsertDto()
                 {
                     Name = payload.Name,

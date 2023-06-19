@@ -7,6 +7,7 @@ namespace WalletService.Dtos
     public class AuthLoginDto
     {
         [Required]
+        [RegularExpression("^233[0-9]{9}$", ErrorMessage = "Invalid account id. ")]
         public string accountID { get; set; }
 
         [Required]

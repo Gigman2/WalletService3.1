@@ -11,6 +11,7 @@ namespace WalletService.Models
         public Guid Id { get; set; }
 
         [Required]
+        [RegularExpression("^233[0-9]{9}$", ErrorMessage = "Invalid account id. ")]
         public string accountID { get; set; }
 
         [Required]
