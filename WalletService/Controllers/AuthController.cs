@@ -35,30 +35,38 @@ namespace WalletService.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateAccount([FromBody] AuthCreateDto account)
         {
-            var accountExist = await repo.AccountExist(account.accountID);
-            if (accountExist) return BadRequest(new { message = "An account with this number already exist", errorCode = 400 });
-
-            string hashedCode = HashValues.Compute(account.code);
-            AuthInsertDto newAccount = new AuthInsertDto()
+            try
             {
-                Id = Guid.NewGuid(),
-                CreatedAt = DateTime.Now,
-                accountID = account.accountID,
-                isAdmin = account.isAdmin,
-                accountHash = hashedCode
-            };
+                var accountExist = await repo.AccountExist(account.accountID);
+                if (accountExist) return BadRequest(new { message = "An account with this number already exist", errorCode = 400 });
 
-            var newAuth = dbMapper.Map<Auth>(newAccount);
-            repo.CreateAccount(newAuth);
+                string hashedCode = HashValues.Compute(account.code);
+                AuthInsertDto newAccount = new AuthInsertDto()
+                {
+                    Id = Guid.NewGuid(),
+                    CreatedAt = DateTime.Now,
+                    accountID = account.accountID,
+                    isAdmin = account.isAdmin,
+                    accountHash = hashedCode
+                };
 
-            var saved = repo.SaveChanges();
-            if (!saved)
-            {
-                return BadRequest();
+                var newAuth = dbMapper.Map<Auth>(newAccount);
+                repo.CreateAccount(newAuth);
+
+                var saved = repo.SaveChanges();
+                if (!saved)
+                {
+                    return BadRequest();
+                }
+
+                newAccount.accountHash = null;
+                var result = dbMapper.Map<AuthMainDto>(newAccount);
+                return Ok(result);
             }
-
-            var result = dbMapper.Map<AuthMainDto>(newAccount);
-            return Ok(result);
+            catch (System.Exception)
+            {
+                return StatusCode((int)System.Net.HttpStatusCode.InternalServerError, "Internal Server Error");
+            }
         }
 
         [HttpPost]

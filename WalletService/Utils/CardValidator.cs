@@ -1,7 +1,6 @@
 using System;
 using System.Text.RegularExpressions;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace WalletService.Utils
 {
@@ -15,14 +14,16 @@ namespace WalletService.Utils
             string[] providers = { "visa", "mastercard" };
 
             if (!providers.Contains(scheme))
+            {
                 return false;
-            // Remove any non-digit characters from the card number
+            }
+
             string cardNumber = Regex.Replace(number, @"[^\d]", "");
 
-            // Validate the card number using regex pattern
             if (!Regex.IsMatch(cardNumber, CreditCardPattern))
+            {
                 return false;
-
+            }
 
             return true;
         }

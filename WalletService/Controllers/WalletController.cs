@@ -70,16 +70,12 @@ namespace WalletService.Controllers
             {
                 var accountID = User.FindFirst("accountid").Value;
                 string hashedNumber = HashValues.Compute(payload.AccountNumber);
+
                 // Check uniqueness of accountNumber
                 var walletExist = await repo.WalletsExist(hashedNumber);
                 if (walletExist) return BadRequest(new { message = "A wallet with this account number already exist", errorCode = 400 });
 
-                if (payload.Type == "card" && payload.AccountNumber.Length >= 6)
-                    payload.AccountNumber = payload.AccountNumber.Substring(0, 6); // cut the first 6 digits
 
-                // Get all wallets of account holder and make sure user does not have more than 5 wallets
-                var total = await repo.TotalWalletsOwned(accountID);
-                if (total >= 5) return BadRequest(new { message = "User has more than 5 wallets", errorCode = 400 });
 
                 if (payload.Type == "card")
                 {
@@ -91,6 +87,15 @@ namespace WalletService.Controllers
                     var validCard = MomoValidator.Validate(payload.AccountScheme, payload.AccountNumber);
                     if (!validCard) return BadRequest(new { message = "Invalid momo number", errorCode = 400 });
                 }
+
+
+
+                if (payload.Type == "card" && payload.AccountNumber.Length >= 6)
+                    payload.AccountNumber = payload.AccountNumber.Substring(0, 6); // cut the first 6 digits
+
+                // Get all wallets of account holder and make sure user does not have more than 5 wallets
+                var total = await repo.TotalWalletsOwned(accountID);
+                if (total >= 5) return BadRequest(new { message = "User has more than 5 wallets", errorCode = 400 });
 
 
 
